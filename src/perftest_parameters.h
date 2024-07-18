@@ -439,6 +439,8 @@ enum memory_type {
 	MEMORY_HOST,
 	MEMORY_MMAP,
 	MEMORY_CUDA,
+    MEMORY_METAX,
+	MEMORY_MOORE,
 	MEMORY_ROCM,
 	MEMORY_NEURON,
 	MEMORY_HL
@@ -570,6 +572,8 @@ struct perftest_parameters {
 	int				cuda_device_id;
 	char				*cuda_device_bus_id;
 	int				use_cuda_dmabuf;
+	int				metax_device_id;
+
 	int				rocm_device_id;
 	int				neuron_core_id;
 	int				use_neuron_dmabuf;

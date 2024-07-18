@@ -224,6 +224,35 @@ if [test $HAVE_EX = yes]; then
 	AC_DEFINE([HAVE_EX], [1], [Have EX support])
 fi
 
+
+AC_ARG_ENABLE([maca],
+              [AS_HELP_STRING([--enable-maca],
+                              [Enable MACA benchmarks])
+              ],
+              [],
+              [enable_maca=no])
+
+AC_ARG_WITH([maca],
+            [AS_HELP_STRING([--with-maca=@<:@MACA installation path@:>@],
+                            [Provide path to MACA installation])
+            ],
+            [AS_CASE([$with_maca],
+                     [yes|no], [],
+                     [CPPFLAGS="-I$with_maca/include $CPPFLAGS"
+                      LDFLAGS="-L$with_maca/lib -Wl,-rpath=$with_maca/lib -lmcruntime $LDFLAGS"])
+            ])
+
+AS_IF([test "x$enable_maca" = xyes], [
+       AC_DEFINE([__MACA_ARCH__], [1], [Enable MACA])
+       AC_CHECK_HEADERS([mcr/mc_runtime_api.h], [],
+                        [AC_MSG_ERROR([cannot include mcr/mc_runtime_api.h])])
+       AC_SEARCH_LIBS([mcFree], [mcruntime], [],
+                      [AC_MSG_ERROR([cannot link with -lmcruntime])])
+       AC_DEFINE([HAVE_MACA], [1], [Enable MACA])
+       ])
+
+AM_CONDITIONAL([MACA], [test x$enable_maca = xyes])
+
 AC_ARG_ENABLE([rocm],
               [AS_HELP_STRING([--enable-rocm],
                               [Enable ROCm benchmarks])

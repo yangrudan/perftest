@@ -15,6 +15,7 @@
 #include "host_memory.h"
 #include "mmap_memory.h"
 #include "cuda_memory.h"
+#include "use_metax_memory.h"
 #include "rocm_memory.h"
 #include "neuron_memory.h"
 #include "hl_memory.h"
@@ -570,6 +571,11 @@ static void usage(const char *argv0, VerbType verb, TestType tst, int connection
 			}
 		}
 
+		if (metax_memory_supported()) {
+			printf("      --use_metax=<metax device id>");
+			printf(" Use selected METAX device for GPUDirect RDMA testing\n");
+		}
+
 		if (rocm_memory_supported()) {
 			printf("      --use_rocm=<rocm device id>");
 			printf(" Use selected ROCm device for GPUDirect RDMA testing\n");
@@ -808,6 +814,8 @@ static void init_perftest_params(struct perftest_parameters *user_param)
 	user_param->cuda_device_id	= 0;
 	user_param->cuda_device_bus_id	= NULL;
 	user_param->use_cuda_dmabuf	= 0;
+	user_param->metax_device_id	= 0;
+
 	user_param->rocm_device_id	= 0;
 	user_param->neuron_core_id	= 0;
 	user_param->mmap_file		= NULL;
@@ -2269,6 +2277,7 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 	static int use_cuda_flag = 0;
 	static int use_cuda_bus_id_flag = 0;
 	static int use_cuda_dmabuf_flag = 0;
+	static int use_metax_flag = 0;
 	static int use_rocm_flag = 0;
 	static int use_neuron_flag = 0;
 	static int use_neuron_dmabuf_flag = 0;
@@ -2423,10 +2432,13 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 			{ .name = "flow_label",		.has_arg = 1, .flag = &flow_label_flag, .val = 1},
 			{ .name = "retry_count",	.has_arg = 1, .flag = &retry_count_flag, .val = 1},
 			{ .name = "dont_xchg_versions",	.has_arg = 0, .flag = &dont_xchg_versions_flag, .val = 1},
+			{ .name = "use_metax",		.has_arg = 1, .flag = &use_metax_flag, .val = 1},
+
 			{ .name = "payload_file_path",	.has_arg = 1, .flag = &payload_flag, .val = 1},
 			{ .name = "use_cuda",		.has_arg = 1, .flag = &use_cuda_flag, .val = 1},
 			{ .name = "use_cuda_bus_id",	.has_arg = 1, .flag = &use_cuda_bus_id_flag, .val = 1},
 			{ .name = "use_cuda_dmabuf",	.has_arg = 0, .flag = &use_cuda_dmabuf_flag, .val = 1},
+			
 			{ .name = "use_rocm",		.has_arg = 1, .flag = &use_rocm_flag, .val = 1},
 			{ .name = "use_neuron",		.has_arg = 1, .flag = &use_neuron_flag, .val = 1},
 			{ .name = "use_neuron_dmabuf",	.has_arg = 0, .flag = &use_neuron_dmabuf_flag, .val = 1},
@@ -2858,6 +2870,7 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 				/* We statically define memory type options so check if requested option is actually supported. */
 				if (((use_cuda_flag || use_cuda_bus_id_flag) && !cuda_memory_supported()) ||
 				    (use_cuda_dmabuf_flag && !cuda_memory_dmabuf_supported()) ||
+					(use_metax_flag && !metax_memory_supported()) ||
 				    (use_rocm_flag && !rocm_memory_supported()) ||
 				    (use_neuron_flag && !neuron_memory_supported()) ||
 				    (use_neuron_dmabuf_flag && !neuron_memory_dmabuf_supported()) ||
@@ -2893,6 +2906,12 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 						return FAILURE;
 					}
 					use_cuda_dmabuf_flag = 0;
+				}
+				if (use_metax_flag) {
+					CHECK_VALUE_NON_NEGATIVE(user_param->metax_device_id,int,"METAX device",not_int_ptr);
+					user_param->memory_type = MEMORY_METAX;
+					user_param->memory_create = metax_memory_create;
+					use_maca_flag = 0;
 				}
 				if (use_rocm_flag) {
 					CHECK_VALUE_NON_NEGATIVE(user_param->rocm_device_id,int,"ROCm device",not_int_ptr);
@@ -3562,7 +3581,11 @@ void ctx_print_test_info(struct perftest_parameters *user_param)
 	if (rocm_memory_supported())
 		printf(" Use ROCm memory : %s\n", user_param->memory_type == MEMORY_ROCM ? "ON" : "OFF");
 
+	if (metax_memory_supported())
+		printf(" Use METAX memory : %s\n", user_param->memory_type == MEMORY_METAX ? "ON" : "OFF");
+
 	printf(" Data ex. method : %s",exchange_state[temp]);
+	
 
 	if (user_param->work_rdma_cm) {
 
