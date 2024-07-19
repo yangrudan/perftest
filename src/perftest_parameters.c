@@ -2911,7 +2911,7 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 					CHECK_VALUE_NON_NEGATIVE(user_param->metax_device_id,int,"METAX device",not_int_ptr);
 					user_param->memory_type = MEMORY_METAX;
 					user_param->memory_create = metax_memory_create;
-					use_maca_flag = 0;
+					use_metax_flag = 0;
 				}
 				if (use_rocm_flag) {
 					CHECK_VALUE_NON_NEGATIVE(user_param->rocm_device_id,int,"ROCm device",not_int_ptr);

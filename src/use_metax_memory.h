@@ -1,5 +1,5 @@
-#ifndef METAX_MEMORY_H
-#define METAX_MEMORY_H
+#ifndef USE_METAX_MEMORY_H
+#define USE_METAX_MEMORY_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -12,7 +12,7 @@ bool metax_memory_supported();
 struct memory_ctx *metax_memory_create(struct perftest_parameters *params);
 
 
-#ifndef HAVE_METAX
+#ifndef HAVE_MACA
 
 inline bool metax_memory_supported() {
 	return false;
