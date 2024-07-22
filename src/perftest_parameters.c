@@ -16,6 +16,7 @@
 #include "mmap_memory.h"
 #include "cuda_memory.h"
 #include "use_metax_memory.h"
+#include "use_moore_memory.h"
 #include "rocm_memory.h"
 #include "neuron_memory.h"
 #include "hl_memory.h"
@@ -576,6 +577,11 @@ static void usage(const char *argv0, VerbType verb, TestType tst, int connection
 			printf(" Use selected METAX device for GPUDirect RDMA testing\n");
 		}
 
+		if (moore_memory_supported()) {
+			printf("      --use_moore=<moore device id>");
+			printf(" Use selected MOORE device for GPUDirect RDMA testing\n");
+		}
+
 		if (rocm_memory_supported()) {
 			printf("      --use_rocm=<rocm device id>");
 			printf(" Use selected ROCm device for GPUDirect RDMA testing\n");
@@ -815,7 +821,7 @@ static void init_perftest_params(struct perftest_parameters *user_param)
 	user_param->cuda_device_bus_id	= NULL;
 	user_param->use_cuda_dmabuf	= 0;
 	user_param->metax_device_id	= 0;
-
+    user_param->moore_device_id = 0;
 	user_param->rocm_device_id	= 0;
 	user_param->neuron_core_id	= 0;
 	user_param->mmap_file		= NULL;
@@ -2278,6 +2284,7 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 	static int use_cuda_bus_id_flag = 0;
 	static int use_cuda_dmabuf_flag = 0;
 	static int use_metax_flag = 0;
+	static int use_moore_flag = 0;
 	static int use_rocm_flag = 0;
 	static int use_neuron_flag = 0;
 	static int use_neuron_dmabuf_flag = 0;
@@ -2433,7 +2440,7 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 			{ .name = "retry_count",	.has_arg = 1, .flag = &retry_count_flag, .val = 1},
 			{ .name = "dont_xchg_versions",	.has_arg = 0, .flag = &dont_xchg_versions_flag, .val = 1},
 			{ .name = "use_metax",		.has_arg = 1, .flag = &use_metax_flag, .val = 1},
-
+            { .name = "use_moore",		.has_arg = 1, .flag = &use_moore_flag, .val = 1},
 			{ .name = "payload_file_path",	.has_arg = 1, .flag = &payload_flag, .val = 1},
 			{ .name = "use_cuda",		.has_arg = 1, .flag = &use_cuda_flag, .val = 1},
 			{ .name = "use_cuda_bus_id",	.has_arg = 1, .flag = &use_cuda_bus_id_flag, .val = 1},
@@ -2912,6 +2919,12 @@ int parser(struct perftest_parameters *user_param,char *argv[], int argc)
 					user_param->memory_type = MEMORY_METAX;
 					user_param->memory_create = metax_memory_create;
 					use_metax_flag = 0;
+				}
+				if (use_moore_flag) {
+					CHECK_VALUE_NON_NEGATIVE(user_param->moore_device_id,int,"MOORE device",not_int_ptr);
+					user_param->memory_type = MEMORY_MOORE;
+					user_param->memory_create = moore_memory_create;
+					use_moore_flag = 0;
 				}
 				if (use_rocm_flag) {
 					CHECK_VALUE_NON_NEGATIVE(user_param->rocm_device_id,int,"ROCm device",not_int_ptr);
@@ -3583,6 +3596,9 @@ void ctx_print_test_info(struct perftest_parameters *user_param)
 
 	if (metax_memory_supported())
 		printf(" Use METAX memory : %s\n", user_param->memory_type == MEMORY_METAX ? "ON" : "OFF");
+		
+	if (moore_memory_supported())
+		printf(" Use MOORE memory : %s\n", user_param->memory_type == MEMORY_MOORE ? "ON" : "OFF");
 
 	printf(" Data ex. method : %s",exchange_state[temp]);
 	

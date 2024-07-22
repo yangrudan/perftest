@@ -253,6 +253,33 @@ AS_IF([test "x$enable_maca" = xyes], [
 
 AM_CONDITIONAL([MACA], [test x$enable_maca = xyes])
 
+
+AC_ARG_ENABLE([musa],
+              [AS_HELP_STRING([--enable-musa],
+                              [Enable MUSA benchmarks])
+              ],
+              [],
+              [enable_musa=no])
+
+AC_ARG_WITH([musa],
+            [AS_HELP_STRING([--with-musa=@<:@MUSA installation path@:>@],
+                            [Provide path to MUSA installation])
+            ],
+            [AS_CASE([$with_musa],
+                     [yes|no], [],
+                     [CPPFLAGS="-I$with_musa/include $CPPFLAGS"
+		      LIBS=$LIBS" -lmusa -lmusart"
+                      LDFLAGS="-L$with_musa/lib -I$with_musa/include -ldl -lrt -pthread -O2 -lmusa -lmusart $LDFLAGS"])
+            ])
+
+AS_IF([test "x$enable_musa" = xyes], [
+       AC_CHECK_HEADERS([musa.h], [],
+                        [AC_MSG_ERROR([cannot include musa.h])])
+       AC_DEFINE([HAVE_MUSA], [1], [Enable MUSA])
+       ])
+
+AM_CONDITIONAL([MUSA], [test x$enable_musa = xyes])
+
 AC_ARG_ENABLE([rocm],
               [AS_HELP_STRING([--enable-rocm],
                               [Enable ROCm benchmarks])

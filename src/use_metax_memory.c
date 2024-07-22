@@ -52,6 +52,9 @@ int metax_memory_init(struct memory_ctx *ctx) {
 		fprintf(stderr, "Couldn't initialize metax device\n");
 		return FAILURE;
 	}
+    else {
+        fprintf(stdout, "Initialize metax device ok!!!!!!!\n");
+    }
 	return SUCCESS;
 }
 
