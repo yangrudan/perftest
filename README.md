@@ -12,4 +12,5 @@
 ./autogen.sh && ./configure --enable-musa --with-musa=/usr/local/musa && make -j8
 
 ``` bash
+ ./ib_send_bw -d mlx5_2 --use_moore=1 -s 4096 -D 20 --report_gbits
 ```
