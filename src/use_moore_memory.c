@@ -20,13 +20,25 @@ struct moore_memory_ctx {
 	int device_id;
 };
 
+static MUdevice muDevice;
+static MUcontext muContext;
 
 static int init_moore(int device_id) {
+    MUdevice mu_device;
+
+    printf("initializing MUSA\n");
+	error = muInit(0);
+	if (error != musaSuccess)
+	{
+		printf("muInit() failed, %s\n", musaGetErrorString(error));
+		exit(1);
+	}
+
 	int deviceCount = 0;
-	musaError_t error = musaGetDeviceCount(&deviceCount);
+	musaError_t error = muDeviceGetCount(&deviceCount);
 
 	if (error != musaSuccess) {
-		printf("musaGetDeviceCount() returned %d\n", error);
+		printf("muDeviceGetCount() returned %d\n", error);
 		return FAILURE;
 	}
 
@@ -36,12 +48,30 @@ static int init_moore(int device_id) {
 		return FAILURE;
 	}
 
-	MOORE_CHECK(musaSetDevice(device_id));
+	MOORE_CHECK(muDeviceGet(&muDevice, musa_device_id));
 
 	struct musaDeviceProp prop = {0};
 	MOORE_CHECK(musaGetDeviceProperties(&prop, device_id));
 	printf("Using moore Device with ID: %d, Name: %s, PCI Bus ID: 0x%x\n",
 	       device_id, prop.name, prop.pciBusID);
+
+    printf("creating MUSA Ctx\n");
+
+	/* Create context */
+	error = muCtxCreate(&muContext, MU_CTX_MAP_HOST, muDevice);
+	if (error != musaSuccess)
+	{
+		printf("muCtxCreate() error=%d\n", error);
+		return 1;
+	}
+
+	printf("making it the current MUSA Ctx\n");
+	error = muCtxSetCurrent(muContext);
+	if (error != musaSuccess)
+	{
+		printf("muCtxSetCurrent() error=%d\n", error);
+		return 1;
+	}
 
 	return SUCCESS;
 }
@@ -60,6 +90,9 @@ int moore_memory_init(struct memory_ctx *ctx) {
 }
 
 int moore_memory_destroy(struct memory_ctx *ctx) {
+    printf("destroying current MUSA Ctx\n");
+	MUCHECK(muCtxDestroy(muContext));
+    
 	struct moore_memory_ctx *moore_ctx = container_of(ctx, struct moore_memory_ctx, base);
 
 	free(moore_ctx);
