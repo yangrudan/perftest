@@ -57,3 +57,6 @@ debian/compat
 debian/*.log
 debian/files
 debian/perftest
+
+#vscode
+.vscode/
