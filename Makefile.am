@@ -35,7 +35,7 @@ AUTOMAKE_OPTIONS= subdir-objects
 
 noinst_LIBRARIES = libperftest.a
 libperftest_a_SOURCES = src/get_clock.c src/perftest_communication.c src/perftest_parameters.c src/perftest_resources.c src/perftest_counters.c src/host_memory.c src/mmap_memory.c
-noinst_HEADERS = src/get_clock.h src/perftest_communication.h src/perftest_parameters.h src/perftest_resources.h src/perftest_counters.h src/memory.h src/host_memory.h src/mmap_memory.h src/cuda_memory.h src/use_metax_memory.h src/rocm_memory.h src/neuron_memory.h src/hl_memory.h
+noinst_HEADERS = src/get_clock.h src/perftest_communication.h src/perftest_parameters.h src/perftest_resources.h src/perftest_counters.h src/memory.h src/host_memory.h src/mmap_memory.h src/cuda_memory.h src/use_metax_memory.h src/use_moore_memory.h src/rocm_memory.h src/neuron_memory.h src/hl_memory.h
 
 if CUDA
 libperftest_a_SOURCES += src/cuda_memory.c
@@ -45,7 +45,9 @@ if MACA
 libperftest_a_SOURCES += src/use_metax_memory.c
 endif
 
-
+if MUSA
+libperftest_a_SOURCES += src/use_moore_memory.c
+endif
 
 if ROCM
 libperftest_a_SOURCES += src/rocm_memory.c

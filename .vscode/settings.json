@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "use_metax_memory.h": "c"
+        "use_metax_memory.h": "c",
+        "perftest_parameters.h": "c"
     }
 }

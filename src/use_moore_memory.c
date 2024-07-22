@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <musa.h>
-#include <musa_runtime.>
+#include <musa_runtime.h>
 #include "use_moore_memory.h"
 #include "perftest_parameters.h"
 
 #define MOORE_CHECK(stmt)			\
 	do {					\
 	musaError_t result = (stmt);		\
-	ASSERT(mcSuccess == result);		\
+	ASSERT(musaSuccess == result);		\
 } while (0)
 
 #define ACCEL_PAGE_SIZE (64 * 1024)
@@ -25,7 +25,7 @@ static int init_moore(int device_id) {
 	int deviceCount = 0;
 	musaError_t error = musaGetDeviceCount(&deviceCount);
 
-	if (error != mcSuccess) {
+	if (error != musaSuccess) {
 		printf("musaGetDeviceCount() returned %d\n", error);
 		return FAILURE;
 	}
@@ -38,7 +38,7 @@ static int init_moore(int device_id) {
 
 	MOORE_CHECK(musaSetDevice(device_id));
 
-	musaDeviceProp prop = {0};
+	struct musaDeviceProp prop = {0};
 	MOORE_CHECK(musaGetDeviceProperties(&prop, device_id));
 	printf("Using moore Device with ID: %d, Name: %s, PCI Bus ID: 0x%x\n",
 	       device_id, prop.name, prop.pciBusID);
@@ -69,11 +69,11 @@ int moore_memory_destroy(struct memory_ctx *ctx) {
 int moore_memory_allocate_buffer(struct memory_ctx *ctx, int alignment, uint64_t size, int *dmabuf_fd,
 				uint64_t *dmabuf_offset, void **addr, bool *can_init) {
 	void *d_A;
-	mcError_t error;
+	musaError_t error;
 	size_t buf_size = (size + ACCEL_PAGE_SIZE - 1) & ~(ACCEL_PAGE_SIZE - 1);
 
 	error = musaMalloc(&d_A, buf_size);
-	if (error != mcSuccess) {
+	if (error != musaSuccess) {
 		printf("musaMalloc error=%d\n", error);
 		return FAILURE;
 	}
