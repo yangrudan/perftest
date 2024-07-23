@@ -27,7 +27,7 @@ static int init_moore(int device_id) {
     MUdevice mu_device;
 
     printf("initializing MUSA\n");
-	error = muInit(0);
+	musaError_t error = muInit(0);
 	if (error != musaSuccess)
 	{
 		printf("muInit() failed, %s\n", musaGetErrorString(error));
@@ -35,7 +35,7 @@ static int init_moore(int device_id) {
 	}
 
 	int deviceCount = 0;
-	musaError_t error = muDeviceGetCount(&deviceCount);
+	error = muDeviceGetCount(&deviceCount);
 
 	if (error != musaSuccess) {
 		printf("muDeviceGetCount() returned %d\n", error);
@@ -48,7 +48,7 @@ static int init_moore(int device_id) {
 		return FAILURE;
 	}
 
-	MOORE_CHECK(muDeviceGet(&muDevice, musa_device_id));
+	MOORE_CHECK(muDeviceGet(&muDevice, device_id));
 
 	struct musaDeviceProp prop = {0};
 	MOORE_CHECK(musaGetDeviceProperties(&prop, device_id));
@@ -91,7 +91,7 @@ int moore_memory_init(struct memory_ctx *ctx) {
 
 int moore_memory_destroy(struct memory_ctx *ctx) {
     printf("destroying current MUSA Ctx\n");
-	MUCHECK(muCtxDestroy(muContext));
+	MOORE_CHECK(muCtxDestroy(muContext));
     
 	struct moore_memory_ctx *moore_ctx = container_of(ctx, struct moore_memory_ctx, base);
 
