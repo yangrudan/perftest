@@ -272,13 +272,19 @@ AC_ARG_WITH([musa],
                       LDFLAGS="-L$with_musa/lib -I$with_musa/include -ldl -lrt -pthread -O2 -lmusa -lmusart $LDFLAGS"])
             ])
 
+
+AC_LANG_PUSH([C++])
 AS_IF([test "x$enable_musa" = xyes], [
        AC_CHECK_HEADERS([musa.h], [],
                         [AC_MSG_ERROR([cannot include musa.h])])
        AC_DEFINE([HAVE_MUSA], [1], [Enable MUSA])
        ])
+AC_LANG_POP([C++])
+
 
 AM_CONDITIONAL([MUSA], [test x$enable_musa = xyes])
+
+
 
 AC_ARG_ENABLE([rocm],
               [AS_HELP_STRING([--enable-rocm],
