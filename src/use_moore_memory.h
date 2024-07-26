@@ -12,22 +12,21 @@ bool moore_memory_supported();
 struct memory_ctx *moore_memory_create(struct perftest_parameters *params);
 
 
-// #ifndef HAVE_MUSA
+#ifndef HAVE_MUSA
 
-// inline bool moore_memory_supported() {
-// 	return false;
-// }
+inline bool moore_memory_supported() {
+ 	return false;
+ }
 
-// inline struct memory_ctx *moore_memory_create(struct perftest_parameters *params) {
-// 	return NULL;
-// }
+ inline struct memory_ctx *moore_memory_create(struct perftest_parameters *params) {
+ 	return NULL;
+}
 
 // #else
 
 // bool moore_memory_supported();
 
 // struct memory_ctx *moore_memory_create(struct perftest_parameters *params);
-
-// #endif
+#endif
 
 #endif /* USE_MOORE_MEMORY_H */

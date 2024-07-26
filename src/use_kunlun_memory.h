@@ -4,13 +4,13 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "memory.h"
+#include "config.h"
 
 struct perftest_parameters;
 
 bool kunlun_memory_supported();
 
 struct memory_ctx *kunlun_memory_create(struct perftest_parameters *params);
-
 
 #ifndef HAVE_KUNLUN
 
@@ -23,5 +23,4 @@ inline struct memory_ctx *kunlun_memory_create(struct perftest_parameters *param
 }
 
 #endif
-
 #endif /* USE_KUNLUN_MEMORY_H */

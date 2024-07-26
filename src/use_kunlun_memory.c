@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 #include <errno.h>
 #include "runtime.h"
 #include "use_kunlun_memory.h"
@@ -32,8 +34,8 @@ static int init_kunlun(int device_id) {
 	}
 
 	xpu_set_device(device_id);
-    xpu_current_device(&devid);
-    xpu_device_get_attr(&devinfo, XPUATTR_DEVID, devid);
+    xpu_current_device(&device_id);
+    xpu_device_get_attr(&devinfo, XPUATTR_DEVID, device_id);
 
 	return SUCCESS;
 }
@@ -61,10 +63,10 @@ int kunlun_memory_destroy(struct memory_ctx *ctx) {
 int kunlun_memory_allocate_buffer(struct memory_ctx *ctx, int alignment, uint64_t size, int *dmabuf_fd,
 				uint64_t *dmabuf_offset, void **addr, bool *can_init) {
 	void *d_A;
-	mcError_t error;
+	int error;
 	size_t buf_size = (size + ACCEL_PAGE_SIZE - 1) & ~(ACCEL_PAGE_SIZE - 1);
 
-	error = xpu_malloc(&d_A, buf_size);
+	error = xpu_malloc(&d_A, buf_size, XPU_MEM_MAIN);
 	if (error != XPU_SUCCESS) {
 		printf("xpu_malloc error=%d\n", error);
 		return FAILURE;
@@ -97,7 +99,7 @@ bool kunlun_memory_supported() {
 	return true;
 }
 
-struct kunlun_ctx *kunlun_memory_create(struct perftest_parameters *params) {
+struct memory_ctx *kunlun_memory_create(struct perftest_parameters *params) {
 	struct kunlun_memory_ctx *ctx;
 
 	ALLOCATE(ctx, struct kunlun_memory_ctx, 1);

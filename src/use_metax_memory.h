@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "memory.h"
+#include "config.h"
 
 struct perftest_parameters;
 

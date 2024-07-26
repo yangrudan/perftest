@@ -298,16 +298,15 @@ AC_ARG_WITH([kunlun],
             ],
             [AS_CASE([$with_kunlun],
                      [yes|no], [],
-                     [CPPFLAGS="-I$with_kunlun/include $CPPFLAGS"
-                      LDFLAGS="-L$with_kunlun/so -Wl,-rpath=$with_kunlun/so -lxpurt $LDFLAGS"])
+                     [CPPFLAGS="-I$with_kunlun/include/xpu $CPPFLAGS"
+                      LIBS=$LIBS" -lxpurt"
+                      LDFLAGS="-L$with_kunlun/so -Wl,-rpath=$with_kunlun/so  -lxpurt  $LDFLAGS"])
             ])
 
 AS_IF([test "x$enable_kunlun" = xyes], [
        AC_DEFINE([__KUNLUN_ARCH__], [1], [Enable KUNLUN])
-       AC_CHECK_HEADERS([xpu/runtime.h], [],
-                        [AC_MSG_ERROR([cannot include xpu/runtime.h])])
-       AC_SEARCH_LIBS([xpurt], [cudart], [],
-                      [AC_MSG_ERROR([cannot link with -lxpurt])])
+       AC_CHECK_HEADERS([runtime.h], [],
+                        [AC_MSG_ERROR([cannot include runtime.h])])
        AC_DEFINE([HAVE_KUNLUN], [1], [Enable KUNLUN])
        ])
 
