@@ -47,3 +47,18 @@ cat /proc/xdr/map_xpus
  ./ib_read_bw  -a  --report_gbits  -d mlx5_1 --mmap=/dev/xdrdrv --mmap-offset=0x0000000090001000
  ./ib_read_bw  -a  --report_gbits  -d mlx5_1 --mmap=/dev/xdrdrv --mmap-offset=0x0000000090001000 10.107.204.3
 ```
+
+## 内存版
+./autogen.sh && ./configure --enable-kunlun --with-kunlun=/usr/local/xruntime && make -j8
+
+```bash
+ ./ib_read_bw  -a  --report_gbits  -d mlx5_1 --use_kunlun=1
+ ./ib_read_bw  -a  --report_gbits  -d mlx5_1 --use_kunlun=1 10.107.204.3
+
+
+ # smi
+ xpu-smi
+
+ mthread-gmi
+
+ mx-smi
