@@ -285,6 +285,33 @@ AC_LANG_POP([C++])
 AM_CONDITIONAL([MUSA], [test x$enable_musa = xyes])
 
 
+AC_ARG_ENABLE([kunlun],
+              [AS_HELP_STRING([--enable-kunlun],
+                              [Enable KUNLUN benchmarks])
+              ],
+              [],
+              [enable_kunlun=no])
+
+AC_ARG_WITH([kunlun],
+            [AS_HELP_STRING([--with-kunlun=@<:@KUNLUN installation path@:>@],
+                            [Provide path to KUNLUN installation])
+            ],
+            [AS_CASE([$with_kunlun],
+                     [yes|no], [],
+                     [CPPFLAGS="-I$with_kunlun/include $CPPFLAGS"
+                      LDFLAGS="-L$with_kunlun/so -Wl,-rpath=$with_kunlun/so -lxpurt $LDFLAGS"])
+            ])
+
+AS_IF([test "x$enable_kunlun" = xyes], [
+       AC_DEFINE([__KUNLUN_ARCH__], [1], [Enable KUNLUN])
+       AC_CHECK_HEADERS([xpu/runtime.h], [],
+                        [AC_MSG_ERROR([cannot include xpu/runtime.h])])
+       AC_SEARCH_LIBS([xpurt], [cudart], [],
+                      [AC_MSG_ERROR([cannot link with -lxpurt])])
+       AC_DEFINE([HAVE_KUNLUN], [1], [Enable KUNLUN])
+       ])
+
+AM_CONDITIONAL([KUNLUN], [test x$enable_kunlun = xyes])
 
 AC_ARG_ENABLE([rocm],
               [AS_HELP_STRING([--enable-rocm],
