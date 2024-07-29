@@ -13,7 +13,7 @@ bool metax_memory_supported();
 struct memory_ctx *metax_memory_create(struct perftest_parameters *params);
 
 
-#ifndef HAVE_MUSA
+#ifndef HAVE_MACA
 
 inline bool metax_memory_supported() {
 	return false;
