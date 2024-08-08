@@ -71,7 +71,7 @@ int metax_memory_allocate_buffer(struct memory_ctx *ctx, int alignment, uint64_t
 	mcError_t error;
 	size_t buf_size = (size + ACCEL_PAGE_SIZE - 1) & ~(ACCEL_PAGE_SIZE - 1);
 
-	error = mcMalloc(&d_A, buf_size);
+	error = mcMallocManaged(&d_A, buf_size, mcMemAttachGlobal);
 	if (error != mcSuccess) {
 		printf("mcMalloc error=%d\n", error);
 		return FAILURE;
