@@ -110,7 +110,7 @@ struct memory_ctx *kunlun_memory_create(struct perftest_parameters *params) {
 	ctx->base.copy_host_to_buffer = memcpy;
 	ctx->base.copy_buffer_to_host = memcpy;
 	ctx->base.copy_buffer_to_buffer = memcpy;
-	ctx->device_id = params->metax_device_id;
+	ctx->device_id = params->kunlun_device_id;
 
 	return &ctx->base;
 }
